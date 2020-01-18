@@ -26,7 +26,6 @@ namespace Lario.Map
         public void SetCollisionMap(CollisionMap collisionMap)
         {
             _collisionMap = collisionMap;
-            IsDrawCollisionMap = true;
         }
 
         public bool IsCollisionUp(Rectangle boxTested)

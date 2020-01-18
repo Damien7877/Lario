@@ -21,6 +21,9 @@ namespace Lario.Player
 
         private bool _isOnGround;
 
+        private int _lifes = 3;
+
+
         public Vector2 Position
         {
             get

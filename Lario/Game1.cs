@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lario
@@ -43,6 +44,8 @@ namespace Lario
 
         Player.Player _player;
 
+        List<Objects.BaseObject> _objects = new List<Objects.BaseObject>();
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -75,6 +78,8 @@ namespace Lario
 
             var tileMapTexture = Content.Load<Texture2D>("Sprites/candy_sheet");
             var collisionTexture = Content.Load<Texture2D>("Sprites/collisions");
+
+            var coinTexture = Content.Load<Texture2D>("Sprites/coinGold");
 
             Map.TileMapData tileMapData = new Map.TileMapData()
             {
@@ -119,6 +124,11 @@ namespace Lario
             _myMap.AddLayer(new Map.TileMap(tileMapData));
             _myMap.SetCollisionMap(new Map.CollisionMap(collisionMapData));
 
+            Objects.Coin coin = new Objects.Coin(coinTexture);
+            coin.Position = new Vector2(10, 700);
+            _objects.Add(coin);
+
+
             var playerTexture = new Texture2D(GraphicsDevice, 40, 40);
             playerTexture.SetData(Enumerable.Repeat(Color.DarkSlateGray, 40*40).ToArray());
            
@@ -160,6 +170,12 @@ namespace Lario
 
             _player.Update(gameTime, _myMap);
             _camera.CenterOn(_player.Position);
+
+            foreach(var obj in _objects)
+            {
+                obj.Update(gameTime);
+            }
+
             base.Update(gameTime);
         }
 
@@ -175,7 +191,14 @@ namespace Lario
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
                 SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, _camera.TranslationMatrix); ;
             _myMap.Draw(spriteBatch);
+            
+            foreach (var obj in _objects)
+            {
+                obj.Draw(spriteBatch);
+            }
+
             _player.Draw(spriteBatch);
+
             spriteBatch.End();
 
             base.Draw(gameTime);

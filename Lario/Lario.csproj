@@ -44,10 +44,13 @@
   <ItemGroup>
     <Compile Include="Camera\Camera.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="Level\Level.cs" />
     <Compile Include="Map\CollisionMap.cs" />
     <Compile Include="Map\Map.cs" />
     <Compile Include="Map\TileMap.cs" />
     <Compile Include="Map\TileMapData.cs" />
+    <Compile Include="Objects\BaseObject.cs" />
+    <Compile Include="Objects\Coin.cs" />
     <Compile Include="Player\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
