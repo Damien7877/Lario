@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Linq;
 
 namespace Lario
 {
@@ -13,40 +14,34 @@ namespace Lario
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        int[,] map = new int[7, 15]
+        int[,] map = new int[15, 15]
             {
-                { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,2 },
-                { 14,15,16,17,18,19,20,21,22,23,24,25,26,27,2 },
-                { 28,29,30,31,32,33,34,35,36,37,38,39,40,41,2 },
-                { 42,43,44,45,46,47,48,49,50,51,52,53,54,55,2 },
-                { 56,57,58,59,60,61,62,63,64,65,66,67,68,69,2 },
-                { 70,71,72,73,74,75,76,77,78,79,80,81,82,83,2 },
-                { 84,85,86,87,88,89,90,91,92,93,94,95,96,97,2 },
-            };
-
-        int[,] collisionMap = new int[7*2, 15*2]
-            {
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-                { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
-                { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+                { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
+                { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
+                { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
+                { -1,-1,-1,-1,-1,-1,24,24,24,24,-1,-1,-1,-1,-1 },
+                { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
+                { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,24,24,24,-1,-1 },
+                { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
+                { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
+                { -1,-1,-1,-1,-1,-1,24,24,24,24,-1,-1,-1,-1,-1 },
+                { -1,-1,24,24,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
+                { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
+                { 31,31,31,31,31,31,31,31,31,31,31,31,31,31,31 },
+                { 44,44,44,44,44,44,44,44,44,44,44,44,44,44,44 },
+                { 44,44,44,44,44,44,44,44,44,44,44,44,44,44,44 },
+                { 44,44,44,44,44,44,44,44,44,44,44,44,44,44,44 },
 
             };
+
+        int[,] collisionMap = new int[30, 30];
 
         Map.Map _myMap;
         private bool _keyADown;
 
         Camera.Camera _camera;
+
+        Player.Player _player;
 
         public Game1()
         {
@@ -83,7 +78,7 @@ namespace Lario
 
             Map.TileMapData tileMapData = new Map.TileMapData()
             {
-                MapHeight = 7,
+                MapHeight = 15,
                 MapWidth = 15,
                 Texture = tileMapTexture,
                 TileHeight  = 70,
@@ -91,24 +86,45 @@ namespace Lario
                 TileMap = map
             };
 
+            for (int y = 0; y < 15; y++)
+            {
+                for (int x = 0; x < 15; x++)
+                {
+                    if(map[y,x] != -1)
+                    {
+                        collisionMap[y * 2, x * 2] = 1;
+                        collisionMap[y * 2, x * 2 + 1] = 1;
+                    }
+                    
+                }
+            }
+
             Map.TileMapData collisionMapData = new Map.TileMapData()
             {
-                MapHeight = 7*2,
-                MapWidth = 15*2,
+                MapHeight = 30,
+                MapWidth = 30,
                 Texture = collisionTexture,
-                TileHeight = 70/2,
-                TileWidth = 70/2,
+                TileHeight = 35,
+                TileWidth = 35,
                 TileMap = collisionMap
             };
 
-
             Rectangle worldSize = new Rectangle(0, 0, tileMapData.MapWidth * tileMapData.TileWidth, tileMapData.MapHeight * tileMapData.TileHeight);
 
-            _camera = new Camera.Camera(worldSize, new Vector2(1000, 600));
+            _camera = new Camera.Camera();
+            _camera.ViewportWidth = 1000;
+            _camera.ViewportHeight = 600;
 
             _myMap = new Map.Map(_camera);
             _myMap.AddLayer(new Map.TileMap(tileMapData));
-            _myMap.SetCollisionMap(new Map.TileMap(collisionMapData));
+            _myMap.SetCollisionMap(new Map.CollisionMap(collisionMapData));
+
+            var playerTexture = new Texture2D(GraphicsDevice, 40, 40);
+            playerTexture.SetData(Enumerable.Repeat(Color.DarkSlateGray, 40*40).ToArray());
+           
+
+            _player = new Player.Player(new Vector2(500, 10), playerTexture);
+            
         }
 
         /// <summary>
@@ -142,26 +158,8 @@ namespace Lario
                 _keyADown = false;
             }
 
-            if(Keyboard.GetState().IsKeyDown(Keys.Down))
-            {
-                _camera.Move(new Vector2(0, 1));
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
-            {
-                _camera.Move(new Vector2(0, -1));
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
-            {
-                _camera.Move(new Vector2(-1, 0));
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
-            {
-                _camera.Move(new Vector2(1, 0));
-            }
-
+            _player.Update(gameTime, _myMap);
+            _camera.CenterOn(_player.Position);
             base.Update(gameTime);
         }
 
@@ -174,8 +172,10 @@ namespace Lario
             double startTime = gameTime.ElapsedGameTime.TotalMilliseconds;
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
+                SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, _camera.TranslationMatrix); ;
             _myMap.Draw(spriteBatch);
+            _player.Draw(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);

@@ -32,37 +32,46 @@ namespace Lario.Map
 
         public void Draw(SpriteBatch spriteBatch, Camera.Camera camera)
         {
-            Rectangle viewPort = camera.CurrentViewPort;
+            var screenRectangle = camera.ViewportWorldBoundry();
 
-            int startX = Math.Max(viewPort.X / _mapData.TileWidth , 0);
-            int startY = Math.Max(viewPort.Y / _mapData.TileHeight, 0);
+            int startX = (int)Math.Max(0, screenRectangle.X / _mapData.TileWidth - 1);
+            int startY = (int)Math.Max(0, screenRectangle.Y / _mapData.TileHeight - 1);
 
-            int endX = Math.Min((viewPort.Right  / _mapData.TileWidth) + 1, _mapData.MapWidth);
-            int endY = Math.Min((viewPort.Bottom / _mapData.TileHeight) + 1, _mapData.MapHeight);
+            int endX = Math.Min(_mapData.MapWidth, screenRectangle.Right / _mapData.TileWidth + 1);
+            int endY = Math.Min(_mapData.MapHeight, screenRectangle.Bottom / _mapData.TileHeight + 1);
 
-            for(int y = startY; y < endY; y++)
+            for (int y = startY; y < endY; y++)
             {
                 for(int x = startX; x < endX; x++)
                 {
                     if(_mapData.TileMap[y, x] > EmptyCell)
                     {
-                        _destinationRectangle.X =  (x  * _mapData.TileWidth) - viewPort.X;
-                        _destinationRectangle.Y = (y * _mapData.TileHeight) - viewPort.Y;
+                        SetDestinationRectangle(y, x);
 
-                        _destinationRectangle.Width = _mapData.TileWidth;
-                        _destinationRectangle.Height = _mapData.TileHeight;
-
-
-                        _sourceRectangle.X = (_mapData.TileMap[y, x] % _numberOfTilesX) * _mapData.TileWidth;
-                        _sourceRectangle.Y = (_mapData.TileMap[y, x] / _numberOfTilesX) * _mapData.TileHeight;
-
-                        _sourceRectangle.Width = _mapData.TileWidth;
-                        _sourceRectangle.Height = _mapData.TileHeight;
+                        SetSourceRectangle(_mapData.TileMap[y, x]);
 
                         spriteBatch.Draw(_mapData.Texture, _destinationRectangle, _sourceRectangle, Color.White);
                     }
                 }
             }
+        }
+
+        private void SetSourceRectangle(int tileNumber)
+        {
+            _sourceRectangle.X = (tileNumber % _numberOfTilesX) * _mapData.TileWidth;
+            _sourceRectangle.Y = (tileNumber / _numberOfTilesX) * _mapData.TileHeight;
+
+            _sourceRectangle.Width = _mapData.TileWidth;
+            _sourceRectangle.Height = _mapData.TileHeight;
+        }
+
+        private void SetDestinationRectangle(int y, int x)
+        {
+            _destinationRectangle.X = (x * _mapData.TileWidth) ;
+            _destinationRectangle.Y = (y * _mapData.TileHeight);
+
+            _destinationRectangle.Width = _mapData.TileWidth;
+            _destinationRectangle.Height = _mapData.TileHeight;
         }
     }
 }

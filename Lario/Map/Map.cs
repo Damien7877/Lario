@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Lario.Map
     {
         private List<TileMap> _layers = new List<TileMap>();
 
-        private TileMap _collisionMap;
+        private CollisionMap _collisionMap;
 
         private Camera.Camera _camera;
 
@@ -22,10 +23,32 @@ namespace Lario.Map
 
         public bool IsDrawCollisionMap { get; set; }
 
-        public void SetCollisionMap(TileMap collisionMap)
+        public void SetCollisionMap(CollisionMap collisionMap)
         {
             _collisionMap = collisionMap;
+            IsDrawCollisionMap = true;
         }
+
+        public bool IsCollisionUp(Rectangle boxTested)
+        {
+            return _collisionMap.IsCollisionUp(boxTested);
+        }
+
+        public bool IsCollisionDown(Rectangle boxTested)
+        {
+            return _collisionMap.IsCollisionDown(boxTested);
+        }
+
+        public bool IsCollisionLeft(Rectangle boxTested)
+        {
+            return _collisionMap.IsCollisionLeft(boxTested);
+        }
+
+        public bool IsCollisionRight(Rectangle boxTested)
+        {
+            return _collisionMap.IsCollisionRight(boxTested);
+        }
+
 
         public void AddLayer(TileMap layer)
         {
@@ -43,6 +66,7 @@ namespace Lario.Map
             {
                 _collisionMap.Draw(spriteBatch, _camera);
             }
+
         }
     }
 }
