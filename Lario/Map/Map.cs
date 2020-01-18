@@ -11,6 +11,22 @@ namespace Lario.Map
     {
         private List<TileMap> _layers = new List<TileMap>();
 
+        private TileMap _collisionMap;
+
+        private Camera.Camera _camera;
+
+        public Map(Camera.Camera camera)
+        {
+            _camera = camera;
+        }
+
+        public bool IsDrawCollisionMap { get; set; }
+
+        public void SetCollisionMap(TileMap collisionMap)
+        {
+            _collisionMap = collisionMap;
+        }
+
         public void AddLayer(TileMap layer)
         {
             _layers.Add(layer);
@@ -20,7 +36,12 @@ namespace Lario.Map
         {
             foreach(var layer in _layers)
             {
-                layer.Draw(spriteBatch);
+                layer.Draw(spriteBatch, _camera);
+            }
+
+            if(IsDrawCollisionMap)
+            {
+                _collisionMap.Draw(spriteBatch, _camera);
             }
         }
     }
