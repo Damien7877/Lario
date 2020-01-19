@@ -57,6 +57,7 @@
     <Compile Include="Scene\BaseScene.cs" />
     <Compile Include="Scene\LevelData.cs" />
     <Compile Include="Scene\LevelScene.cs" />
+    <Compile Include="Scene\MenuScene.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

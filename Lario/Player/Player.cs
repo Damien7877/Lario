@@ -12,7 +12,7 @@ namespace Lario.Player
 {
     public class Player
     {
-        private const int MaxLife = 3;
+        public const int MaxLife = 3;
 
         private Vector2 _initialPosition;
         private Vector2 _position;
@@ -77,6 +77,16 @@ namespace Lario.Player
             HandleVelocity(gameTime);
 
             HandleCollisionsWithWorld(worldMap);
+
+            HandlePlayerOutbound(worldMap);
+        }
+
+        private void HandlePlayerOutbound(Map.Map worldMap)
+        {
+            if(worldMap.IsOutOfBound(Position))
+            {
+                Life = 0;
+            }
         }
 
         private void HandleVelocity(GameTime gameTime)
@@ -174,5 +184,10 @@ namespace Lario.Player
             Life += lifeAffected;
         }
 
+        public void Jump(float jumpForce)
+        {
+            _velocity.Y -= jumpForce;
+            _isOnGround = false;
+        }
     }
 }

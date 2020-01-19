@@ -26,10 +26,10 @@ namespace Lario.Scene
                 { -1,-1,-1,-1,-1,-1,24,24,24,24,-1,-1,-1,-1,-1 },
                 { -1,-1,24,24,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
                 { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
-                { 31,31,31,31,31,31,31,31,31,31,31,31,31,31,31 },
-                { 44,44,44,44,44,44,44,44,44,44,44,44,44,44,44 },
-                { 44,44,44,44,44,44,44,44,44,44,44,44,44,44,44 },
-                { 44,44,44,44,44,44,44,44,44,44,44,44,44,44,44 },
+                { 31,31,31,31,31,31,31,31,-1,31,31,31,31,31,31 },
+                { 44,44,44,44,44,44,44,44,-1,44,44,44,44,44,44 },
+                { 44,44,44,44,44,44,44,44,-1,44,44,44,44,44,44 },
+                { 44,44,44,44,44,44,44,44,-1,44,44,44,44,44,44 },
 
         };
 
@@ -53,6 +53,12 @@ namespace Lario.Scene
 
         private Texture2D _coinTexture;
 
+        private Texture2D _emptyHeartHud;
+        private Texture2D _fullHeartHud;
+
+        private Texture2D _coinHud;
+        private Dictionary<char, Texture2D> _numbersTexturesHud = new Dictionary<char, Texture2D>();
+
         private SpriteFont _font;
 
         public LevelScene(GraphicsDevice graphics, ContentManager content) : base(graphics, content)
@@ -70,8 +76,8 @@ namespace Lario.Scene
         private void LoadObjects()
         {
             Objects.Coin coin = new Objects.Coin(_coinTexture);
-            coin.Position = new Vector2(10, 700);
-            coin.Size = new Vector2(70, 70);
+            coin.Position = new Vector2(50, 700);
+            coin.Size = new Vector2(37, 37);
 
             _objects.Add(coin);
         }
@@ -88,6 +94,8 @@ namespace Lario.Scene
 
             _font = Content.Load<SpriteFont>("Font/Arial");
 
+            LoadHudTextures();
+
             Map.TileMapData tileMapData = new Map.TileMapData()
             {
                 MapHeight = 15,
@@ -102,10 +110,17 @@ namespace Lario.Scene
             {
                 for (int x = 0; x < 15; x++)
                 {
+                    if (x == 0 || x == 14)
+                    {
+                        collisionMap[y * 2, x * 2] = 1;
+                        collisionMap[y * 2 + 1, x * 2] = 1;
+                    }
                     if (map[y, x] != -1)
                     {
                         collisionMap[y * 2, x * 2] = 1;
                         collisionMap[y * 2, x * 2 + 1] = 1;
+                        collisionMap[y * 2 + 1, x * 2] = 1;
+                        collisionMap[y * 2 + 1, x * 2 + 1] = 1;
                     }
 
                 }
@@ -121,10 +136,10 @@ namespace Lario.Scene
                 TileMap = collisionMap
             };
 
-            
+
 
             _camera = new Camera.Camera();
-            _camera.ViewportWidth = 1000;
+            _camera.ViewportWidth = 800;
             _camera.ViewportHeight = 600;
 
             _myMap = new Map.Map(_camera);
@@ -143,6 +158,20 @@ namespace Lario.Scene
             Reset();
         }
 
+        private void LoadHudTextures()
+        {
+            _emptyHeartHud = Content.Load<Texture2D>("Sprites/hud_heartEmpty");
+
+            _fullHeartHud = Content.Load<Texture2D>("Sprites/hud_heartFull");
+
+            _coinHud = Content.Load<Texture2D>("Sprites/hud_coins");
+
+            for (int i = 0; i < 10; i++)
+            {
+                _numbersTexturesHud[Convert.ToChar(i + Convert.ToInt32('0'))] = Content.Load<Texture2D>("Sprites/hud_" + i);
+            }
+        }
+
         public override void Draw(GameTime gameTime)
         {
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
@@ -159,13 +188,41 @@ namespace Lario.Scene
             _spriteBatch.End();
             _spriteBatch.Begin();
 
-            _spriteBatch.DrawString(_font, "Score : " + _levelData.Score, new Vector2(10,10),Color.Black);
-            _spriteBatch.DrawString(_font, "Life : " + _player.Life, new Vector2(10, 30), Color.Black);
+            DrawUi(_spriteBatch, gameTime);
+
             _spriteBatch.End();
 
         }
 
+        private void DrawUi(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            Vector2 heatPosition = new Vector2(GraphicsDevice.Viewport.Width - (_emptyHeartHud.Width * 3) - 10, 10);
+            for (int i = 0; i < Player.Player.MaxLife; i++)
+            {
+                
+                if(_player.Life < i+1)
+                {
+                    spriteBatch.Draw(_emptyHeartHud, heatPosition, Color.White);
+                }
+                else
+                {
+                    spriteBatch.Draw(_fullHeartHud, heatPosition, Color.White);
+                }
+                heatPosition.X += _emptyHeartHud.Width;
+            }
+            Vector2 positionScore = new Vector2(10, 10);
+            spriteBatch.Draw(_coinHud, positionScore, Color.White);
 
+            positionScore.X += _coinHud.Width + 5;
+            positionScore.Y += 3;
+            foreach(char car in _levelData.Score.ToString().AsEnumerable())
+            {
+                spriteBatch.Draw(_numbersTexturesHud[car], positionScore, Color.White);
+                positionScore.X += _numbersTexturesHud[car].Width + 2;
+            }
+
+            spriteBatch.DrawString(_font, "Time : " + gameTime.ElapsedGameTime.TotalMilliseconds,new Vector2(10, 100) , Color.White);
+        }
 
         public override void Update(GameTime gameTime)
         {
@@ -197,6 +254,11 @@ namespace Lario.Scene
             }
 
             _objects.RemoveAll(o => o.IsRemoved);
+
+            if(!_player.IsAlive)
+            {
+                Reset();
+            }
         }
 
         private void OnCollisionBetween(Player.Player player, BaseObject obj)
@@ -213,6 +275,10 @@ namespace Lario.Scene
         private void AffectPlayerByGameObject(ObjectData levelUpdateData)
         {
             _player.AffectLife(levelUpdateData.PlayerLife);
+            if(levelUpdateData.PlayerJump)
+            {
+                _player.Jump(levelUpdateData.JumpForce);
+            }
         }
 
         private void AffectLevelByGameObject(ObjectData obj)

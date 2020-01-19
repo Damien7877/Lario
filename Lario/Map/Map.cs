@@ -48,6 +48,11 @@ namespace Lario.Map
             return _collisionMap.IsCollisionRight(boxTested);
         }
 
+        public bool IsOutOfBound(Vector2 position)
+        {
+            
+            return _collisionMap.IsOutOfBound(position);
+        }
 
         public void AddLayer(TileMap layer)
         {

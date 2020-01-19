@@ -56,6 +56,25 @@ namespace Lario.Map
             }
         }
 
+        public bool IsOutOfBound(Vector2 position)
+        {
+            if(position.X < 0 || position.Y < 0)
+            {
+                return true;
+            }
+
+            if(position.X > _mapData.MapWidth * _mapData.TileWidth)
+            {
+                return true;
+            }
+
+            if (position.Y > _mapData.MapHeight * _mapData.TileHeight)
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         public bool IsCollisionRight(Rectangle boxTested)
         {
@@ -70,7 +89,7 @@ namespace Lario.Map
 
         public bool IsCollisionDown(Rectangle boxTested)
         {
-            return IsCollision(boxTested, -1, 1, 1, 2);
+            return IsCollision(boxTested, 0, 1, 1, 2);
         }
 
         public bool IsCollisionUp(Rectangle boxTested)
@@ -110,6 +129,7 @@ namespace Lario.Map
 
             return false;
         }
+
 
 
 
