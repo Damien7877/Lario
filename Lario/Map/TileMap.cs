@@ -28,6 +28,12 @@ namespace Lario.Map
             _mapData = mapData.Clone();
 
             _numberOfTilesX = (_mapData.Texture.Width / _mapData.TileWidth);
+
+            _sourceRectangle.Width = _mapData.TileWidth;
+            _sourceRectangle.Height = _mapData.TileHeight;
+
+            _destinationRectangle.Width = _mapData.TileWidth;
+            _destinationRectangle.Height = _mapData.TileHeight;
         }
 
         public void Draw(SpriteBatch spriteBatch, Camera.Camera camera)
@@ -61,8 +67,7 @@ namespace Lario.Map
             _sourceRectangle.X = (tileNumber % _numberOfTilesX) * _mapData.TileWidth;
             _sourceRectangle.Y = (tileNumber / _numberOfTilesX) * _mapData.TileHeight;
 
-            _sourceRectangle.Width = _mapData.TileWidth;
-            _sourceRectangle.Height = _mapData.TileHeight;
+
         }
 
         private void SetDestinationRectangle(int y, int x)
@@ -70,8 +75,7 @@ namespace Lario.Map
             _destinationRectangle.X = (x * _mapData.TileWidth) ;
             _destinationRectangle.Y = (y * _mapData.TileHeight);
 
-            _destinationRectangle.Width = _mapData.TileWidth;
-            _destinationRectangle.Height = _mapData.TileHeight;
+
         }
     }
 }

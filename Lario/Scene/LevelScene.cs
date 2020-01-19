@@ -68,7 +68,7 @@ namespace Lario.Scene
         public void Reset()
         {
             _player.Reset();
-
+            _levelData.Score = 0;
             _objects.Clear();
             LoadObjects();
         }
@@ -174,7 +174,7 @@ namespace Lario.Scene
 
         public override void Draw(GameTime gameTime)
         {
-            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
+            _spriteBatch.Begin(SpriteSortMode.Texture, BlendState.AlphaBlend,
                SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, _camera.TranslationMatrix); ;
             _myMap.Draw(_spriteBatch);
 
@@ -186,6 +186,8 @@ namespace Lario.Scene
             _player.Draw(_spriteBatch);
 
             _spriteBatch.End();
+
+
             _spriteBatch.Begin();
 
             DrawUi(_spriteBatch, gameTime);
@@ -218,7 +220,7 @@ namespace Lario.Scene
             foreach(char car in _levelData.Score.ToString().AsEnumerable())
             {
                 spriteBatch.Draw(_numbersTexturesHud[car], positionScore, Color.White);
-                positionScore.X += _numbersTexturesHud[car].Width + 2;
+                positionScore.X += _numbersTexturesHud[car].Width;
             }
 
             spriteBatch.DrawString(_font, "Time : " + gameTime.ElapsedGameTime.TotalMilliseconds,new Vector2(10, 100) , Color.White);
@@ -239,7 +241,11 @@ namespace Lario.Scene
             }
 
             _player.Update(gameTime, _myMap);
-            _camera.CenterOn(_player.Position);
+            if(_player.HasMoved)
+            {
+                _camera.CenterOn(_player.Position);
+            }
+            
 
             var playerCollisionBox = _player.PlayerCollisionBox;
 

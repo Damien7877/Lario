@@ -55,6 +55,8 @@ namespace Lario.Player
             }
         }
 
+        public bool HasMoved { get; private set; }
+
         public Player(Vector2 position, Texture2D playerSprite)
         {
             _position = position;
@@ -72,6 +74,8 @@ namespace Lario.Player
 
         public void Update(GameTime gameTime, Map.Map worldMap)
         {
+            HasMoved = false;
+
             HandleKeyboard();
 
             HandleVelocity(gameTime);
@@ -128,12 +132,14 @@ namespace Lario.Player
             if (_velocity.X < 0 && !worldMap.IsCollisionLeft(playerCollisionBox))
             {
                 _position.X += _velocity.X;
+                HasMoved = true;
 
             }
 
             if (_velocity.X > 0 && !worldMap.IsCollisionRight(playerCollisionBox))
             {
                 _position.X += _velocity.X;
+                HasMoved = true;
             }
 
             if (_velocity.Y < 0 && worldMap.IsCollisionUp(playerCollisionBox))
@@ -151,6 +157,7 @@ namespace Lario.Player
             {
                 _position.Y += _velocity.Y;
                 _isOnGround = false;
+                HasMoved = true;
             }
         }
 

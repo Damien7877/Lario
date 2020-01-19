@@ -16,7 +16,7 @@ namespace Lario.Objects
             LevelUpdateData = new ObjectData
             {
                 PlayerLife = 0,
-                Score = 10203,
+                Score = 1,
             };
 
             IsRemovedOnCollision = true;
