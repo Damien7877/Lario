@@ -61,6 +61,11 @@ namespace Lario.Scene
 
         private SpriteFont _font;
 
+        public delegate void PlayerDeathHandler();
+
+        // Declare the event.
+        public event PlayerDeathHandler OnPlayerDeath;
+
         public LevelScene(GraphicsDevice graphics, ContentManager content) : base(graphics, content)
         {
         }
@@ -263,7 +268,7 @@ namespace Lario.Scene
 
             if(!_player.IsAlive)
             {
-                Reset();
+                OnPlayerDeath();
             }
         }
 

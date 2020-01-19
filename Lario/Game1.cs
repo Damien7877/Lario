@@ -16,6 +16,8 @@ namespace Lario
 
         Scene.BaseScene _currentScene;
 
+        Scene.LevelScene _currentLevel;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -43,7 +45,18 @@ namespace Lario
         /// </summary>
         protected override void LoadContent()
         {
-            _currentScene = new Scene.LevelScene(GraphicsDevice, Content);
+            _currentLevel = new Scene.LevelScene(GraphicsDevice, Content);
+
+            _currentLevel.OnPlayerDeath += () =>
+            {
+                Console.WriteLine("You are dead");
+                _currentLevel.Reset();
+                //Next is to display exit or retry screen 
+                
+            };
+
+            _currentScene = _currentLevel;
+
             _currentScene.InitializeContent();
         }
 
