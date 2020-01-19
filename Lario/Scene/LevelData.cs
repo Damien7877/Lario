@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lario.Level
+namespace Lario.Scene
 {
-    public class Level
+    public class LevelData
     {
+        public int Score { get; set; }
+
+       
     }
 }

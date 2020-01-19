@@ -12,6 +12,9 @@ namespace Lario.Player
 {
     public class Player
     {
+        private const int MaxLife = 3;
+
+        private Vector2 _initialPosition;
         private Vector2 _position;
         private Vector2 _velocity;
 
@@ -21,8 +24,16 @@ namespace Lario.Player
 
         private bool _isOnGround;
 
-        private int _lifes = 3;
+        public int Life { get; private set; } = MaxLife;
 
+        public bool IsAlive
+        {
+            get { return Life > 0; }
+        }
+
+        private bool IsInvinsible { get; set; }
+
+        private DateTime _startInvinsibleTime;
 
         public Vector2 Position
         {
@@ -32,33 +43,44 @@ namespace Lario.Player
             }
         }
 
+        public Rectangle PlayerCollisionBox
+        {
+            get
+            {
+                return new Rectangle(
+                        (int)_position.X,
+                        (int)_position.Y,
+                        _playerSprite.Width,
+                        _playerSprite.Height);
+            }
+        }
+
         public Player(Vector2 position, Texture2D playerSprite)
         {
             _position = position;
+            _initialPosition = Position;
+
+
             _playerSprite = playerSprite;
+        }
+
+        public void Reset()
+        {
+            _position = new Vector2(_initialPosition.X, _initialPosition.Y);
+            Life = MaxLife;
         }
 
         public void Update(GameTime gameTime, Map.Map worldMap)
         {
+            HandleKeyboard();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
-            {
-                _velocity.X -= 0.5f;
-            }
+            HandleVelocity(gameTime);
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
-            {
-                _velocity.X += 0.5f;
+            HandleCollisionsWithWorld(worldMap);
+        }
 
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Up) && _isOnGround)
-            {
-                _velocity.Y -= 7.0f;
-                _isOnGround = false;
-            }
-
-
+        private void HandleVelocity(GameTime gameTime)
+        {
             float time = (float)gameTime.ElapsedGameTime.TotalSeconds;
             _velocity += Gravity * time;
 
@@ -82,7 +104,10 @@ namespace Lario.Player
             }
 
             _velocity.X *= 0.925f;
+        }
 
+        private void HandleCollisionsWithWorld(Map.Map worldMap)
+        {
             //check for collision
             var playerCollisionBox = new Rectangle(
                 (int)_position.X + (int)_velocity.X,
@@ -90,24 +115,24 @@ namespace Lario.Player
                 _playerSprite.Width,
                 _playerSprite.Height);
 
-            if(_velocity.X < 0 && !worldMap.IsCollisionLeft(playerCollisionBox) )
+            if (_velocity.X < 0 && !worldMap.IsCollisionLeft(playerCollisionBox))
             {
                 _position.X += _velocity.X;
 
             }
 
-            if(_velocity.X > 0 && !worldMap.IsCollisionRight(playerCollisionBox))
+            if (_velocity.X > 0 && !worldMap.IsCollisionRight(playerCollisionBox))
             {
                 _position.X += _velocity.X;
             }
 
-            if(_velocity.Y < 0 && worldMap.IsCollisionUp(playerCollisionBox))
+            if (_velocity.Y < 0 && worldMap.IsCollisionUp(playerCollisionBox))
             {
                 _velocity.Y = 0;
             }
-            
 
-            if (_velocity.Y > 0 &&  worldMap.IsCollisionDown(playerCollisionBox))
+
+            if (_velocity.Y > 0 && worldMap.IsCollisionDown(playerCollisionBox))
             {
                 _velocity.Y = 0;
                 _isOnGround = true;
@@ -115,6 +140,27 @@ namespace Lario.Player
             else
             {
                 _position.Y += _velocity.Y;
+                _isOnGround = false;
+            }
+        }
+
+        private void HandleKeyboard()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            {
+                _velocity.X -= 0.5f;
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                _velocity.X += 0.5f;
+
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Up) && _isOnGround)
+            {
+                _velocity.Y -= 7.0f;
+                _isOnGround = false;
             }
         }
 
@@ -122,5 +168,11 @@ namespace Lario.Player
         {
             spriteBatch.Draw(_playerSprite, _position, Color.White);
         }
+
+        public void AffectLife(int lifeAffected)
+        {
+            Life += lifeAffected;
+        }
+
     }
 }
