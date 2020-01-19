@@ -124,8 +124,6 @@ namespace Lario.Scene
                     {
                         collisionMap[y * 2, x * 2] = 1;
                         collisionMap[y * 2, x * 2 + 1] = 1;
-                        collisionMap[y * 2 + 1, x * 2] = 1;
-                        collisionMap[y * 2 + 1, x * 2 + 1] = 1;
                     }
 
                 }
@@ -154,12 +152,9 @@ namespace Lario.Scene
 
 
 
-            var playerTexture = new Texture2D(GraphicsDevice, 40, 40);
-            playerTexture.SetData(Enumerable.Repeat(Color.DarkSlateGray, 40 * 40).ToArray());
 
-
-            _player = new Player.Player(new Vector2(500, 10), playerTexture);
-
+            _player = new Player.Player(new Vector2(500, 10));
+            _player.Initialize(Content);
             Reset();
         }
 

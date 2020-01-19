@@ -1,5 +1,7 @@
 ﻿using Lario.Map;
+using Lario.Sprites;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -18,11 +20,19 @@ namespace Lario.Player
         private Vector2 _position;
         private Vector2 _velocity;
 
-        private Texture2D _playerSprite;
+        private PlayerState _state;
+        private Texture2D _idleTexture;
+        private SpriteAnimation _runAnimation;
+        private Texture2D _jumpTexture;
+
+        private bool isTextureFlip;
 
         private readonly Vector2 Gravity = new Vector2(0, 9.8f);
 
         private bool _isOnGround;
+
+        
+
 
         public int Life { get; private set; } = MaxLife;
 
@@ -31,9 +41,7 @@ namespace Lario.Player
             get { return Life > 0; }
         }
 
-        private bool IsInvinsible { get; set; }
 
-        private DateTime _startInvinsibleTime;
 
         public Vector2 Position
         {
@@ -50,20 +58,35 @@ namespace Lario.Player
                 return new Rectangle(
                         (int)_position.X,
                         (int)_position.Y,
-                        _playerSprite.Width,
-                        _playerSprite.Height);
+                        _idleTexture.Width,
+                        _idleTexture.Height);
             }
         }
 
         public bool HasMoved { get; private set; }
 
-        public Player(Vector2 position, Texture2D playerSprite)
+        public Player(Vector2 position)
         {
             _position = position;
             _initialPosition = Position;
+            _state = PlayerState.Idle;
+        }
 
+        public void Initialize(ContentManager content)
+        {
+            //Idle texture
+            _idleTexture = content.Load<Texture2D>("PlayerAnimation/Male/player_idle");
 
-            _playerSprite = playerSprite;
+            //Run animation
+            var run1 = content.Load<Texture2D>("PlayerAnimation/Male/player_walk1");
+            var run2 = content.Load<Texture2D>("PlayerAnimation/Male/player_walk2");
+            _runAnimation = new SpriteAnimation(2);
+            _runAnimation.TimeBetweenFrames = 150;
+            _runAnimation.SetFrameTexture(0, run1);
+            _runAnimation.SetFrameTexture(1, run2);
+
+            //Jump texture
+            _jumpTexture = content.Load<Texture2D>("PlayerAnimation/Male/player_jump");
         }
 
         public void Reset()
@@ -83,6 +106,25 @@ namespace Lario.Player
             HandleCollisionsWithWorld(worldMap);
 
             HandlePlayerOutbound(worldMap);
+
+            if(_state == PlayerState.Run)
+            {
+                _runAnimation.Update(gameTime);
+            }
+
+            if (Math.Abs(_velocity.X) > 0.5f && _isOnGround)
+            {
+                _state = PlayerState.Run;
+                
+            }
+            else if(_isOnGround)
+            {
+                _state = PlayerState.Idle;
+            }
+            else
+            {
+                _state = PlayerState.Jump;
+            }
         }
 
         private void HandlePlayerOutbound(Map.Map worldMap)
@@ -110,14 +152,22 @@ namespace Lario.Player
 
             if (_velocity.Y >= 0)
             {
-                _velocity.Y = Math.Min(_velocity.Y, 10);
+                _velocity.Y = Math.Min(_velocity.Y, 8);
             }
             else
             {
-                _velocity.Y = Math.Max(_velocity.Y, -10);
+                _velocity.Y = Math.Max(_velocity.Y, -8);
             }
 
-            _velocity.X *= 0.925f;
+
+
+            _velocity.X *= 0.95f;
+
+            //Used to avoid jittering mouvment on player
+            if(Math.Abs(_velocity.X) < 0.4)
+            {
+                _velocity.X = 0;
+            }
         }
 
         private void HandleCollisionsWithWorld(Map.Map worldMap)
@@ -126,21 +176,8 @@ namespace Lario.Player
             var playerCollisionBox = new Rectangle(
                 (int)_position.X + (int)_velocity.X,
                 (int)_position.Y + (int)_velocity.Y,
-                _playerSprite.Width,
-                _playerSprite.Height);
-
-            if (_velocity.X < 0 && !worldMap.IsCollisionLeft(playerCollisionBox))
-            {
-                _position.X += _velocity.X;
-                HasMoved = true;
-
-            }
-
-            if (_velocity.X > 0 && !worldMap.IsCollisionRight(playerCollisionBox))
-            {
-                _position.X += _velocity.X;
-                HasMoved = true;
-            }
+                _idleTexture.Width,
+                _idleTexture.Height);
 
             if (_velocity.Y < 0 && worldMap.IsCollisionUp(playerCollisionBox))
             {
@@ -159,6 +196,31 @@ namespace Lario.Player
                 _isOnGround = false;
                 HasMoved = true;
             }
+
+            if (_velocity.X < 0)
+            {
+                if (!worldMap.IsCollisionLeft(playerCollisionBox))
+                {
+                    _position.X += _velocity.X;
+                    HasMoved = true;
+                }
+            }
+
+
+            if (_velocity.X > 0 )
+            {
+                if (!worldMap.IsCollisionRight(playerCollisionBox))
+                {
+                    _position.X += _velocity.X;
+                    HasMoved = true;
+                }
+            }
+
+
+
+
+            _position.Y = (float)Math.Ceiling(_position.Y);
+            _position.X = (float)Math.Ceiling(_position.X);
         }
 
         private void HandleKeyboard()
@@ -176,14 +238,27 @@ namespace Lario.Player
 
             if (Keyboard.GetState().IsKeyDown(Keys.Up) && _isOnGround)
             {
-                _velocity.Y -= 7.0f;
+                _velocity.Y -= 8.0f;
                 _isOnGround = false;
             }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_playerSprite, _position, Color.White);
+            
+            switch(_state)
+            {
+                case PlayerState.Idle:
+                    spriteBatch.Draw(_idleTexture, _position, Color.White);
+                    break;
+                case PlayerState.Jump:
+                    spriteBatch.Draw(_jumpTexture, _position, Color.White);
+                    break;
+                case PlayerState.Run:
+                    _runAnimation.Draw(spriteBatch, _position);
+                    break;
+            }
+            
         }
 
         public void AffectLife(int lifeAffected)

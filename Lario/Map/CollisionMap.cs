@@ -84,13 +84,13 @@ namespace Lario.Map
 
         public bool IsCollisionRight(Rectangle boxTested)
         {
-            return  IsCollision(boxTested, 1, 2, 0, 1); 
+            return  IsCollision(boxTested, -2, 2, -1, 1); 
         }
 
         public bool IsCollisionLeft(Rectangle boxTested)
         {
             
-            return IsCollision(boxTested, -1, 0, 0, 1);
+            return IsCollision(boxTested, -2, 2, -1, 1);
         }
 
         public bool IsCollisionDown(Rectangle boxTested)
@@ -142,7 +142,7 @@ namespace Lario.Map
         private Vector2 GetTestedOriginOnMap(Rectangle boxTested)
         {
             decimal posX = (decimal)boxTested.X + (boxTested.Width / 2);
-            decimal posY = (decimal)boxTested.Y + (boxTested.Height / 2);
+            decimal posY = (decimal)boxTested.Y + (boxTested.Height -10);
             int positionXMap = (int)Math.Floor(posX / (decimal)_mapData.TileWidth);
             int positionYMap = (int)Math.Floor(posY / (decimal) _mapData.TileHeight);
 

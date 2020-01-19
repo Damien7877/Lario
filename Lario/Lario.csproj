@@ -52,6 +52,7 @@
     <Compile Include="Objects\Coin.cs" />
     <Compile Include="Objects\ObjectData.cs" />
     <Compile Include="Player\Player.cs" />
+    <Compile Include="Player\PlayerState.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scene\BaseScene.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Scene\LevelScene.cs" />
     <Compile Include="Scene\MenuScene.cs" />
     <Compile Include="Scene\NextLevelOrRetryScene.cs" />
+    <Compile Include="Sprites\SpriteAnimation.cs" />
     <Compile Include="Ui\Button.cs" />
   </ItemGroup>
   <ItemGroup>
