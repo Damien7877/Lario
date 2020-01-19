@@ -18,11 +18,14 @@ namespace Lario
 
         Scene.LevelScene _currentLevel;
 
+        Scene.MenuScene _menuScene;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 800;
             graphics.PreferredBackBufferHeight = 600;
+            
             Content.RootDirectory = "Content";
         }
 
@@ -34,8 +37,8 @@ namespace Lario
         /// </summary>
         protected override void Initialize()
         {
-            
 
+            this.IsMouseVisible = true;
             base.Initialize();
         }
 
@@ -45,19 +48,38 @@ namespace Lario
         /// </summary>
         protected override void LoadContent()
         {
+            _menuScene = new Scene.MenuScene(GraphicsDevice, Content);
+            _menuScene.InitializeContent();
+
+            _menuScene.OnQuitGame += OnQuitGame;
+
+            _menuScene.OnPlayGame += OnPlayGame;
+
+
+
+            _currentScene = _menuScene;
+        }
+
+        private void OnPlayGame()
+        {
             _currentLevel = new Scene.LevelScene(GraphicsDevice, Content);
 
-            _currentLevel.OnPlayerDeath += () =>
-            {
-                Console.WriteLine("You are dead");
-                _currentLevel.Reset();
-                //Next is to display exit or retry screen 
-                
-            };
+            _currentLevel.OnPlayerDeath += OnPlayerDeath;
 
+            _currentLevel.InitializeContent();
             _currentScene = _currentLevel;
+        }
 
-            _currentScene.InitializeContent();
+        private void OnQuitGame()
+        {
+            Exit();
+        }
+
+        private void OnPlayerDeath()
+        {
+            _currentLevel.OnPlayerDeath -= OnPlayerDeath;
+
+            _currentScene = _menuScene;
         }
 
         /// <summary>
@@ -76,9 +98,6 @@ namespace Lario
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             _currentScene.Update(gameTime);
 
             base.Update(gameTime);

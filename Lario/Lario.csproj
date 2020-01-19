@@ -59,6 +59,7 @@
     <Compile Include="Scene\LevelScene.cs" />
     <Compile Include="Scene\MenuScene.cs" />
     <Compile Include="Scene\NextLevelOrRetryScene.cs" />
+    <Compile Include="Ui\Button.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

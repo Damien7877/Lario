@@ -144,8 +144,8 @@ namespace Lario.Scene
 
 
             _camera = new Camera.Camera();
-            _camera.ViewportWidth = 800;
-            _camera.ViewportHeight = 600;
+            _camera.ViewportWidth = GraphicsDevice.Viewport.Width;
+            _camera.ViewportHeight = GraphicsDevice.Viewport.Height;
 
             _myMap = new Map.Map(_camera);
             _myMap.AddLayer(new Map.TileMap(tileMapData));
@@ -233,6 +233,8 @@ namespace Lario.Scene
 
         public override void Update(GameTime gameTime)
         {
+
+
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
                 _keyADown = true;
@@ -266,9 +268,9 @@ namespace Lario.Scene
 
             _objects.RemoveAll(o => o.IsRemoved);
 
-            if(!_player.IsAlive)
+            if (!_player.IsAlive)
             {
-                OnPlayerDeath();
+                OnPlayerDeath?.Invoke();
             }
         }
 
@@ -295,6 +297,11 @@ namespace Lario.Scene
         private void AffectLevelByGameObject(ObjectData obj)
         {
             _levelData.Score += obj.Score;
+        }
+
+        public override void Unload()
+        {
+            
         }
     }
 }

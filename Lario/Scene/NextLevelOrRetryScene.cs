@@ -11,6 +11,8 @@ namespace Lario.Scene
 {
     public class NextLevelOrRetryScene : BaseScene
     {
+
+
         public NextLevelOrRetryScene(GraphicsDevice graphicsDevice, ContentManager content) : base(graphicsDevice, content)
         {
         }
@@ -21,6 +23,11 @@ namespace Lario.Scene
         }
 
         public override void InitializeContent()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Unload()
         {
             throw new NotImplementedException();
         }
