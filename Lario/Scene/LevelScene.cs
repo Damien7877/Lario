@@ -260,14 +260,26 @@ namespace Lario.Scene
             }
 
             _player.Update(gameTime, _myMap);
-            if(_player.HasMoved)
+            if (_player.HasMoved)
             {
                 _camera.CenterOn(_player.Position);
             }
-            
+
 
             var playerCollisionBox = _player.PlayerCollisionBox;
 
+            HandleObjects(gameTime, playerCollisionBox);
+
+            
+
+            if (!_player.IsAlive)
+            {
+                OnPlayerDeath?.Invoke();
+            }
+        }
+
+        private void HandleObjects(GameTime gameTime, Rectangle playerCollisionBox)
+        {
             foreach (var obj in _objects)
             {
                 obj.Update(gameTime);
@@ -286,11 +298,6 @@ namespace Lario.Scene
             }
 
             _objects.RemoveAll(o => o.IsRemoved);
-
-            if (!_player.IsAlive)
-            {
-                OnPlayerDeath?.Invoke();
-            }
         }
 
         private void AffectPlayerByGameObject(GameTime gameTime, ObjectData levelUpdateData)
