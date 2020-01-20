@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Lario.Ennemy
 {
-    public class FlyingEnnemy : BaseObject
+    public class FlyingEnemy : BaseObject
     {
         private enum State
         {
@@ -25,13 +25,18 @@ namespace Lario.Ennemy
 
         private State _state;
 
-        public FlyingEnnemy(Texture2D deadTexture, SpriteAnimation flyingAnimation) : base()
+        public FlyingEnemy(Texture2D deadTexture, SpriteAnimation flyingAnimation) : base()
         {
             _deadTexture = deadTexture;
 
             _flyingAnimation = flyingAnimation;
 
             _state = State.Idle;
+
+            LevelUpdateData = new ObjectData
+            {
+                PlayerLife = -1
+            };
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -53,12 +58,34 @@ namespace Lario.Ennemy
             }
         }
 
-        public override bool IsCollisionWith(Rectangle collisionBox)
+        public override CollisionDirection IsCollisionWith(Rectangle collisionBox, double collisionDirection)
         {
-            return false;
+            Rectangle enemyCollisionBox = new Rectangle(
+                (int)Position.X + ((int)Size.X / 3),
+                (int)Position.Y + ((int)Size.Y / 3),
+                (int)Size.X / 3,
+                (int)Size.Y / 3);
+
+            if(enemyCollisionBox.Intersects(collisionBox))
+            {
+                if (collisionDirection > 25 && collisionDirection < 130)
+                {
+                    LevelUpdateData.PlayerLife = 0;
+                    LevelUpdateData.PlayerJump = true;
+                    LevelUpdateData.JumpForce = 13;
+                    return CollisionDirection.Down;
+                }
+                else
+                {
+                    return CollisionDirection.All;
+                }
+            }
+
+
+            return CollisionDirection.None;
         }
 
-        public override void OnCollision()
+        public override void OnCollision(CollisionDirection collisionDirection)
         {
             
         }
@@ -69,6 +96,11 @@ namespace Lario.Ennemy
             {
                 _flyingAnimation.Update(gameTime);
             }
+        }
+
+        public override bool IsRemovedOnCollision(CollisionDirection collisionDirection)
+        {
+            return collisionDirection == CollisionDirection.Down;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Lario.Map;
+﻿using Lario.Events;
+using Lario.Map;
 using Lario.Sprites;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -41,6 +42,9 @@ namespace Lario.Player
             get { return Life > 0; }
         }
 
+        public bool IsInvinsible { get; private set; }
+
+        private TimedEvent _timedEventInvinsible;
 
 
         public Vector2 Position
@@ -59,6 +63,17 @@ namespace Lario.Player
             }
         }
 
+        public double DirectionAngle
+        {
+            get
+            {
+                double angle = Math.Atan2(_velocity.Y, _velocity.X);
+                double angleInDegree = angle * 180 / Math.PI;
+
+                return (360 + Math.Floor(angleInDegree)) % 360;
+            }
+        }
+
         public bool HasMoved { get; private set; }
 
         public Player(Vector2 position)
@@ -66,6 +81,8 @@ namespace Lario.Player
             _position = position;
             _initialPosition = Position;
             _state = PlayerState.Idle;
+
+            _timedEventInvinsible = new TimedEvent(2000, () => IsInvinsible = false);
         }
 
         public void Initialize(ContentManager content)
@@ -120,6 +137,11 @@ namespace Lario.Player
             else
             {
                 _state = PlayerState.Jump;
+            }
+
+            if(IsInvinsible)
+            {
+                _timedEventInvinsible.Update(gameTime.TotalGameTime.TotalMilliseconds);
             }
         }
 
@@ -260,8 +282,19 @@ namespace Lario.Player
             
         }
 
-        public void AffectLife(int lifeAffected)
+        public void AffectLife(GameTime gameTime, int lifeAffected)
         {
+            if(IsInvinsible && lifeAffected < 0)
+            {
+                return;
+            }
+
+            if(lifeAffected < 0)
+            {
+                _timedEventInvinsible.Start(gameTime.TotalGameTime.TotalMilliseconds);
+                IsInvinsible = true;
+            }
+
             Life += lifeAffected;
         }
 

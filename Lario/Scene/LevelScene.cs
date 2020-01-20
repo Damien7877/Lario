@@ -98,8 +98,10 @@ namespace Lario.Scene
             flyingAnimation.SetFrameTexture(1, flyingTexture2);
             flyingAnimation.TimeBetweenFrames = 200;
 
-            FlyingEnnemy enemy1 = new FlyingEnnemy(flyingDeadTexture, flyingAnimation);
-            enemy1.Position = new Vector2(300, 300);
+            FlyingEnemy enemy1 = new FlyingEnemy(flyingDeadTexture, flyingAnimation);
+            enemy1.Position = new Vector2(300, 500);
+            enemy1.Size = new Vector2(flyingDeadTexture.Width, flyingDeadTexture.Height);
+
 
             _objects.Add(enemy1);
         }
@@ -132,7 +134,7 @@ namespace Lario.Scene
             {
                 for (int x = 0; x < 15; x++)
                 {
-                    if (x == 0 || x == 14)
+                    if (x == 0 || x == 14 || y == 0)
                     {
                         collisionMap[y, x] = 1;
                     }
@@ -270,9 +272,16 @@ namespace Lario.Scene
             {
                 obj.Update(gameTime);
 
-                if(obj.IsCollisionWith(playerCollisionBox))
+                var collisionDirection = obj.IsCollisionWith(playerCollisionBox, _player.DirectionAngle);
+                if (collisionDirection != CollisionDirection.None)
                 {
-                    OnCollisionBetween(_player, obj);
+                    obj.OnCollision(collisionDirection);
+                    AffectLevelByGameObject(gameTime, obj.LevelUpdateData);
+                    AffectPlayerByGameObject(gameTime, obj.LevelUpdateData);
+                    if (obj.IsRemovedOnCollision(collisionDirection))
+                    {
+                        obj.IsRemoved = true;
+                    }
                 }
             }
 
@@ -284,27 +293,16 @@ namespace Lario.Scene
             }
         }
 
-        private void OnCollisionBetween(Player.Player player, BaseObject obj)
+        private void AffectPlayerByGameObject(GameTime gameTime, ObjectData levelUpdateData)
         {
-            obj.OnCollision();
-            AffectLevelByGameObject(obj.LevelUpdateData);
-            AffectPlayerByGameObject(obj.LevelUpdateData);
-            if (obj.IsRemovedOnCollision)
-            {
-                obj.IsRemoved = true;
-            }
-        }
-
-        private void AffectPlayerByGameObject(ObjectData levelUpdateData)
-        {
-            _player.AffectLife(levelUpdateData.PlayerLife);
+            _player.AffectLife(gameTime, levelUpdateData.PlayerLife);
             if(levelUpdateData.PlayerJump)
             {
                 _player.Jump(levelUpdateData.JumpForce);
             }
         }
 
-        private void AffectLevelByGameObject(ObjectData obj)
+        private void AffectLevelByGameObject(GameTime gameTime, ObjectData obj)
         {
             _levelData.Score += obj.Score;
         }

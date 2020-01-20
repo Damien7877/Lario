@@ -19,8 +19,6 @@ namespace Lario.Objects
                 PlayerLife = 0,
                 Score = 1,
             };
-
-            IsRemovedOnCollision = true;
         }
 
         public override void Update(GameTime gameTime)
@@ -33,21 +31,30 @@ namespace Lario.Objects
             spriteBatch.Draw(_texture, Position, Color.White);
         }
 
-        public override bool IsCollisionWith(Rectangle collisionBox)
+        public override CollisionDirection IsCollisionWith(Rectangle collisionBox, double collisionDirection)
         {
             Rectangle coinCollisionBox = new Rectangle(
                 (int)Position.X,
                 (int)Position.Y,
-                (int)Position.X + (int)Size.X,
-                (int)Position.Y + (int)Size.Y);
+                (int)Size.X,
+                (int)Size.Y);
 
+            if (coinCollisionBox.Intersects(collisionBox))
+            {
+                return CollisionDirection.All;
+            }
+            return CollisionDirection.None;
 
-            return coinCollisionBox.Intersects(collisionBox);
         }
 
-        public override void OnCollision()
+        public override void OnCollision(CollisionDirection collisionDirection)
         {
             //Play sound Collected
+        }
+
+        public override bool IsRemovedOnCollision(CollisionDirection collisionDirection)
+        {
+            return true;
         }
     }
 }

@@ -8,6 +8,17 @@ using System.Threading.Tasks;
 
 namespace Lario.Objects
 {
+    public enum CollisionDirection
+    {
+        Up,
+        Down,
+        Left,
+        Right,
+
+        None,
+        All
+    }
+
     public abstract class BaseObject
     {
 
@@ -18,7 +29,7 @@ namespace Lario.Objects
 
         public Vector2 Size { get; set; }
 
-        public bool IsRemovedOnCollision { get; protected set; }
+        
 
         public bool IsRemoved { get; set; }
 
@@ -35,9 +46,17 @@ namespace Lario.Objects
 
         public abstract void Draw(SpriteBatch spriteBatch);
 
-        public abstract bool IsCollisionWith(Rectangle collisionBox);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collisionBox"></param>
+        /// <param name="collisionDirection">Angle of collision of the object</param>
+        /// <returns></returns>
+        public abstract CollisionDirection IsCollisionWith(Rectangle collisionBox, double collisionDirection);
 
-        public abstract void OnCollision();
+        public abstract void OnCollision(CollisionDirection collisionDirection);
+
+        public abstract bool IsRemovedOnCollision(CollisionDirection collisionDirection);
 
         public override string ToString()
         {
