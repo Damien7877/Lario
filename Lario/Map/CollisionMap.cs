@@ -64,7 +64,7 @@ namespace Lario.Map
 
         public bool IsOutOfBound(Vector2 position)
         {
-            if(position.X < 0 || position.Y < 0)
+            if(position.X < 0)
             {
                 return true;
             }

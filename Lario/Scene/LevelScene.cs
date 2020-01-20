@@ -1,4 +1,6 @@
-﻿using Lario.Objects;
+﻿using Lario.Ennemy;
+using Lario.Objects;
+using Lario.Sprites;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -80,11 +82,26 @@ namespace Lario.Scene
 
         private void LoadObjects()
         {
-            Objects.Coin coin = new Objects.Coin(_coinTexture);
+            Coin coin = new Coin(_coinTexture);
             coin.Position = new Vector2(50, 700);
             coin.Size = new Vector2(37, 37);
 
             _objects.Add(coin);
+
+
+            var flyingDeadTexture = Content.Load<Texture2D>("Sprites/bee_dead");
+            var flyingTexture1 = Content.Load<Texture2D>("Sprites/bee");
+            var flyingTexture2 = Content.Load<Texture2D>("Sprites/bee_fly");
+
+            SpriteAnimation flyingAnimation = new SpriteAnimation(2);
+            flyingAnimation.SetFrameTexture(0, flyingTexture1);
+            flyingAnimation.SetFrameTexture(1, flyingTexture2);
+            flyingAnimation.TimeBetweenFrames = 200;
+
+            FlyingEnnemy enemy1 = new FlyingEnnemy(flyingDeadTexture, flyingAnimation);
+            enemy1.Position = new Vector2(300, 300);
+
+            _objects.Add(enemy1);
         }
 
         public override void InitializeContent()
@@ -117,13 +134,11 @@ namespace Lario.Scene
                 {
                     if (x == 0 || x == 14)
                     {
-                        collisionMap[y * 2, x * 2] = 1;
-                        collisionMap[y * 2 + 1, x * 2] = 1;
+                        collisionMap[y, x] = 1;
                     }
                     if (map[y, x] != -1)
                     {
-                        collisionMap[y * 2, x * 2] = 1;
-                        collisionMap[y * 2, x * 2 + 1] = 1;
+                        collisionMap[y, x] = 1;
                     }
 
                 }
@@ -131,11 +146,11 @@ namespace Lario.Scene
 
             Map.TileMapData collisionMapData = new Map.TileMapData()
             {
-                MapHeight = 30,
-                MapWidth = 30,
+                MapHeight = 15,
+                MapWidth = 15,
                 Texture = collisionTexture,
-                TileHeight = 35,
-                TileWidth = 35,
+                TileHeight = 70,
+                TileWidth = 70,
                 TileMap = collisionMap
             };
 

@@ -10,9 +10,10 @@ namespace Lario.Objects
 {
     public class Coin : BaseObject
     {
-
-        public Coin(Texture2D texture) : base(texture)
+        protected Texture2D _texture;
+        public Coin(Texture2D texture) : base()
         {
+            _texture = texture;
             LevelUpdateData = new ObjectData
             {
                 PlayerLife = 0,

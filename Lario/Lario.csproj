@@ -43,6 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Camera\Camera.cs" />
+    <Compile Include="Ennemy\FlyingEnnemy.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Map\CollisionMap.cs" />
     <Compile Include="Map\Map.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Scene\LevelScene.cs" />
     <Compile Include="Scene\MenuScene.cs" />
     <Compile Include="Scene\NextLevelOrRetryScene.cs" />
+    <Compile Include="Sprites\Sprite.cs" />
     <Compile Include="Sprites\SpriteAnimation.cs" />
     <Compile Include="Ui\Button.cs" />
   </ItemGroup>

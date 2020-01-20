@@ -21,16 +21,16 @@ namespace Lario.Player
         private Vector2 _velocity;
 
         private PlayerState _state;
-        private Texture2D _idleTexture;
+        private Sprite _idleSprite;
         private SpriteAnimation _runAnimation;
-        private Texture2D _jumpTexture;
+        private Sprite _jumpSprite;
 
-        private bool isTextureFlip;
+        
 
         private readonly Vector2 Gravity = new Vector2(0, 9.8f);
 
         private bool _isOnGround;
-
+        private bool isDirectionBack;
         
 
 
@@ -55,11 +55,7 @@ namespace Lario.Player
         {
             get
             {
-                return new Rectangle(
-                        (int)_position.X,
-                        (int)_position.Y,
-                        _idleTexture.Width,
-                        _idleTexture.Height);
+                return _idleSprite.GetCollisionBox(_position);
             }
         }
 
@@ -75,7 +71,7 @@ namespace Lario.Player
         public void Initialize(ContentManager content)
         {
             //Idle texture
-            _idleTexture = content.Load<Texture2D>("PlayerAnimation/Male/player_idle");
+            _idleSprite = new Sprite(content.Load<Texture2D>("PlayerAnimation/Male/player_idle"));
 
             //Run animation
             var run1 = content.Load<Texture2D>("PlayerAnimation/Male/player_walk1");
@@ -86,7 +82,7 @@ namespace Lario.Player
             _runAnimation.SetFrameTexture(1, run2);
 
             //Jump texture
-            _jumpTexture = content.Load<Texture2D>("PlayerAnimation/Male/player_jump");
+            _jumpSprite = new Sprite(content.Load<Texture2D>("PlayerAnimation/Male/player_jump"));
         }
 
         public void Reset()
@@ -159,9 +155,16 @@ namespace Lario.Player
                 _velocity.Y = Math.Max(_velocity.Y, -8);
             }
 
+            if(_velocity.X > 0)
+            {
+                isDirectionBack = false;
+            }
+            else if(_velocity.X < 0)
+            {
+                isDirectionBack = true;
+            }
 
-
-            _velocity.X *= 0.95f;
+            _velocity.X *= 0.925f;
 
             //Used to avoid jittering mouvment on player
             if(Math.Abs(_velocity.X) < 0.4)
@@ -173,11 +176,7 @@ namespace Lario.Player
         private void HandleCollisionsWithWorld(Map.Map worldMap)
         {
             //check for collision
-            var playerCollisionBox = new Rectangle(
-                (int)_position.X + (int)_velocity.X,
-                (int)_position.Y + (int)_velocity.Y,
-                _idleTexture.Width,
-                _idleTexture.Height);
+            var playerCollisionBox = _idleSprite.GetCollisionBox(_position + _velocity);
 
             if (_velocity.Y < 0 && worldMap.IsCollisionUp(playerCollisionBox))
             {
@@ -249,13 +248,13 @@ namespace Lario.Player
             switch(_state)
             {
                 case PlayerState.Idle:
-                    spriteBatch.Draw(_idleTexture, _position, Color.White);
+                    _idleSprite.Draw(spriteBatch, _position, isDirectionBack);
                     break;
                 case PlayerState.Jump:
-                    spriteBatch.Draw(_jumpTexture, _position, Color.White);
+                    _jumpSprite.Draw(spriteBatch, _position, isDirectionBack);
                     break;
                 case PlayerState.Run:
-                    _runAnimation.Draw(spriteBatch, _position);
+                    _runAnimation.Draw(spriteBatch, _position, isDirectionBack);
                     break;
             }
             

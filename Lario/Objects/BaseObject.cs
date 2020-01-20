@@ -22,13 +22,12 @@ namespace Lario.Objects
 
         public bool IsRemoved { get; set; }
 
-        protected Texture2D _texture;
+
 
         public ObjectData LevelUpdateData { get; protected set; }
 
-        protected BaseObject(Texture2D texture)
+        protected BaseObject()
         {
-            _texture = texture;
             ObjectId = Guid.NewGuid();
         }
 

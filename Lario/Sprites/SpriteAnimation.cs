@@ -43,9 +43,16 @@ namespace Lario.Sprites
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, bool isFlippedHorizontally = false)
         {
-            spriteBatch.Draw(_frames[_currentFrame], position, Color.White);
+            SpriteEffects flip = SpriteEffects.None;
+            if (isFlippedHorizontally)
+            {
+                flip = SpriteEffects.FlipHorizontally;
+            }
+
+            Rectangle dest = new Rectangle((int)position.X, (int)position.Y, _frames[_currentFrame].Width, _frames[_currentFrame].Height);
+            spriteBatch.Draw(_frames[_currentFrame], dest, null, Color.White, 0f , Vector2.Zero, flip, 0f);
         }
     }
 }
