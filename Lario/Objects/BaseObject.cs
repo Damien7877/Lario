@@ -54,7 +54,7 @@ namespace Lario.Objects
         /// <returns></returns>
         public abstract CollisionDirection IsCollisionWith(Rectangle collisionBox, double collisionDirection);
 
-        public abstract void OnCollision(CollisionDirection collisionDirection);
+        public abstract void OnCollision(GameTime gameTime, CollisionDirection collisionDirection);
 
         public abstract bool IsRemovedOnCollision(CollisionDirection collisionDirection);
 

@@ -8,6 +8,7 @@ namespace Lario.Events
 {
     public class TimedEvent
     {
+        private bool _isStarted;
         private double _startTime;
 
         private double _timeOut;
@@ -22,15 +23,17 @@ namespace Lario.Events
 
         public void Start(double startTime)
         {
+            _isStarted = true;
             _startTime = startTime;
         }
 
         public void Update(double elapsedTime)
         {
-            if (elapsedTime - _startTime > _timeOut)
+            if (_isStarted && (elapsedTime - _startTime) > _timeOut)
             {
                 _actionToExecute?.Invoke();
                 _startTime = elapsedTime;
+                _isStarted = false;
             }
         }
     }

@@ -47,7 +47,7 @@ namespace Lario.Objects
 
         }
 
-        public override void OnCollision(CollisionDirection collisionDirection)
+        public override void OnCollision(GameTime gameTime, CollisionDirection collisionDirection)
         {
             //Play sound Collected
         }

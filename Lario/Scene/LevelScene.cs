@@ -289,7 +289,7 @@ namespace Lario.Scene
                 var collisionDirection = obj.IsCollisionWith(playerCollisionBox, _player.DirectionAngle);
                 if (collisionDirection != CollisionDirection.None)
                 {
-                    obj.OnCollision(collisionDirection);
+                    obj.OnCollision(gameTime, collisionDirection);
                     AffectLevelByGameObject(gameTime, obj.LevelUpdateData);
                     AffectPlayerByGameObject(gameTime, obj.LevelUpdateData);
                     if (obj.IsRemovedOnCollision(collisionDirection))

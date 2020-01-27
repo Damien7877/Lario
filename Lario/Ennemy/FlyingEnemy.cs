@@ -3,11 +3,6 @@ using Lario.Objects;
 using Lario.Sprites;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lario.Ennemy
 {
@@ -23,11 +18,13 @@ namespace Lario.Ennemy
         
 
         private TimedEvent _timedIdle;
+        private TimedEvent _timedDead;
 
 
         public FlyingEnemy(Texture2D deadTexture, SpriteAnimation flyingAnimation) : base()
         {
             _deadTexture = deadTexture;
+            
 
             _flyingAnimation = flyingAnimation;
 
@@ -37,6 +34,9 @@ namespace Lario.Ennemy
             };
 
             _timedIdle = new TimedEvent(2000, () => _state = State.Moving);
+            _timedDead = new TimedEvent(2000, () => IsRemoved = true);
+
+            _state = State.Moving;
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -85,20 +85,32 @@ namespace Lario.Ennemy
             return CollisionDirection.None;
         }
 
-        public override void OnCollision(CollisionDirection collisionDirection)
+        public override void OnCollision(GameTime gameTime, CollisionDirection collisionDirection)
         {
-            
+            _state = State.Dead;
+            _timedDead.Start(gameTime.TotalGameTime.TotalMilliseconds);
         }
 
         public override void Update(GameTime gameTime)
         {
             _timedIdle.Update(gameTime.TotalGameTime.TotalMilliseconds);
+            _timedDead.Update(gameTime.TotalGameTime.TotalMilliseconds);
+
             UpdateWaypoint(gameTime);
+
+            if(_state == State.Dead)
+            {
+                float time = (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Velocity += Gravity * time * 2;
+                //Enemy go down when dead 
+            }
 
             if (_state != State.Dead)
             {
                 _flyingAnimation.Update(gameTime);
             }
+
+            Position += Velocity;
         }
 
         private void UpdateWaypoint(GameTime gameTime)
@@ -108,6 +120,7 @@ namespace Lario.Ennemy
 
                 if (Vector2.Distance(Position, _waypoints[_currentWaypoint.Value]) < 0.1 && _state == State.Moving)
                 {
+                    Velocity = Vector2.Zero;
                     _state = State.Idle;
                     Position = _waypoints[_currentWaypoint.Value];
                     _currentWaypoint = (_currentWaypoint + 1) % _waypoints.Count;
@@ -118,6 +131,8 @@ namespace Lario.Ennemy
                     var direction = (_waypoints[_currentWaypoint.Value] - Position) / 100;
                     direction.Normalize();
 
+                    Velocity = direction;
+
                     if (direction.X < 0)
                     {
                         _isDirectionLeft = false;
@@ -127,14 +142,14 @@ namespace Lario.Ennemy
                         _isDirectionLeft = true;
                     }
 
-                    Position += direction;
+                   
                 }
             }
         }
 
         public override bool IsRemovedOnCollision(CollisionDirection collisionDirection)
         {
-            return collisionDirection == CollisionDirection.Down;
+            return false;
         }
 
         

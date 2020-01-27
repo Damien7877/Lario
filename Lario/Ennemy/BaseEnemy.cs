@@ -27,6 +27,10 @@ namespace Lario.Ennemy
 
         public bool LoopThroughWaypoint { get; set; }
 
+        protected readonly Vector2 Gravity = new Vector2(0, 9.8f);
+
+        public Vector2 Velocity { get; set; }
+
         public BaseEnemy() : base()
         {
             _state = State.Idle;
