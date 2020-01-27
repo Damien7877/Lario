@@ -25,7 +25,7 @@ namespace Lario.Player
         private Sprite _idleSprite;
         private SpriteAnimation _runAnimation;
         private Sprite _jumpSprite;
-
+        private bool _isVisible;
         
 
         private readonly Vector2 Gravity = new Vector2(0, 9.8f);
@@ -83,6 +83,7 @@ namespace Lario.Player
             _state = PlayerState.Idle;
 
             _timedEventInvinsible = new TimedEvent(2000, () => IsInvinsible = false);
+            _isVisible = true;
         }
 
         public void Initialize(ContentManager content)
@@ -141,7 +142,12 @@ namespace Lario.Player
 
             if(IsInvinsible)
             {
+                _isVisible = !_isVisible;
                 _timedEventInvinsible.Update(gameTime.TotalGameTime.TotalMilliseconds);
+            }
+            else
+            {
+                _isVisible = true;
             }
         }
 
@@ -266,19 +272,22 @@ namespace Lario.Player
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            
-            switch(_state)
+            if(_isVisible)
             {
-                case PlayerState.Idle:
-                    _idleSprite.Draw(spriteBatch, _position, isDirectionBack);
-                    break;
-                case PlayerState.Jump:
-                    _jumpSprite.Draw(spriteBatch, _position, isDirectionBack);
-                    break;
-                case PlayerState.Run:
-                    _runAnimation.Draw(spriteBatch, _position, isDirectionBack);
-                    break;
+                switch (_state)
+                {
+                    case PlayerState.Idle:
+                        _idleSprite.Draw(spriteBatch, _position, isDirectionBack);
+                        break;
+                    case PlayerState.Jump:
+                        _jumpSprite.Draw(spriteBatch, _position, isDirectionBack);
+                        break;
+                    case PlayerState.Run:
+                        _runAnimation.Draw(spriteBatch, _position, isDirectionBack);
+                        break;
+                }
             }
+
             
         }
 
