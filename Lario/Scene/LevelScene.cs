@@ -99,8 +99,10 @@ namespace Lario.Scene
             flyingAnimation.TimeBetweenFrames = 200;
 
             FlyingEnemy enemy1 = new FlyingEnemy(flyingDeadTexture, flyingAnimation);
-            enemy1.Position = new Vector2(300, 500);
+            enemy1.Position = new Vector2(100, 500);
             enemy1.Size = new Vector2(flyingDeadTexture.Width, flyingDeadTexture.Height);
+            enemy1.AddWaypoint(new Vector2(100, 500));
+            enemy1.AddWaypoint(new Vector2(400, 500));
 
 
             _objects.Add(enemy1);

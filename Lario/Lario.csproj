@@ -43,6 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Camera\Camera.cs" />
+    <Compile Include="Ennemy\BaseEnemy.cs" />
     <Compile Include="Ennemy\FlyingEnemy.cs" />
     <Compile Include="Events\TimedEvent.cs" />
     <Compile Include="Game1.cs" />
